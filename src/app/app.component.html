@@ -1,0 +1,102 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" style="color:white;">Student Manager</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02"
+    aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarColor02">
+    <form class="form-inline my-2 my-lg-0">
+      <input type="search" (ngModelChange)="searchStudents(key.value)" #key="ngModel" ngModel name="key" id="searchName"
+        class="form-control mr-sm-2" placeholder="Search students..." required>
+        <div class="btn-group">
+          <button type="button" class="btn btn-secondary mr-1" (click)="filterByDepartment('')">All Departments</button>
+          <button type="button" class="btn btn-secondary mr-1" (click)="filterByDepartment('Software Engineering')">Software Engineering</button>
+          <button type="button" class="btn btn-secondary mr-1" (click)="filterByDepartment('Computer Engineering')">Computer Engineering</button>
+          <button type="button" class="btn btn-secondary mr-1" (click)="filterByDepartment('Computer Science')">Computer Science</button>
+          <button type="button" class="btn btn-secondary mr-1" (click)="filterByDepartment('Information Systems')">Information Systems</button>
+          <button type="button" class="btn btn-secondary" (click)="filterByDepartment('Digital Business')">Digital Business</button>
+        </div>
+    </form>
+  </div>
+</nav>
+
+
+<div class="container" id="main-container">
+  <table class="table">
+    <thead class="thead-light">
+      <tr>
+        <th scope="col">No.</th>
+        <th scope="col">Name</th>
+        <th scope="col">Student Number</th>
+        <th scope="col">Email</th>
+        <th scope="col">Department</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let student of students; let i = index">
+        <th scope="row">{{ i + 1 }}</th>
+        <td class="align-middle">
+          <ng-container *ngIf="!isEditMode(i); else editModeName">
+            {{ student?.name }}
+          </ng-container>
+          <ng-template #editModeName>
+            <input type="text" [ngModel]="student?.name" (ngModelChange)="students && (students[i].name = $event)" >
+          </ng-template>
+        </td>
+        <td class="align-middle">
+          <ng-container *ngIf="!isEditMode(i); else editModeStudentID">
+            {{ student?.studentID }}
+          </ng-container>
+          <ng-template #editModeStudentID>
+            <input type="text" [ngModel]="student?.studentID" (ngModelChange)="students && (students[i].studentID = $event)">
+          </ng-template>
+        </td>
+        <td class="align-middle">
+          <ng-container *ngIf="!isEditMode(i); else editModeEmail">
+            {{ student?.email }}
+          </ng-container>
+          <ng-template #editModeEmail>
+            <input type="text" [ngModel]="student?.email" (ngModelChange)="students && (students[i].email = $event)">
+          </ng-template>
+        </td>
+        <td class="align-middle">
+          <ng-container *ngIf="!isEditMode(i); else editModeDepartment">
+            {{ student?.department }}
+          </ng-container>
+          <ng-template #editModeDepartment>
+            <input type="text" [ngModel]="student?.department" (ngModelChange)="students && (students[i].department = $event)">
+          </ng-template>
+        </td>
+        <td class="align-middle">
+          <div class="btn-group btn-group-sm">
+            <button class="btn btn-primary tooltips" data-placement="top" data-original-title="Save"
+                    *ngIf="isEditMode(i)" (click)="disableEditMode()" title="Save">
+              <i class="fa fa-floppy-o"></i>
+            </button>
+            <button class="btn btn-secondary tooltips" data-placement="top" data-original-title="Edit"
+                    *ngIf="!isEditMode(i)" (click)="enableEditMode(i)" title="Edit">
+              <i class="fa fa-pencil"></i>
+            </button>
+            <button class="btn btn-danger tooltips" data-placement="top" data-original-title="Delete"
+                    *ngIf="!isEditMode(i)" (click)="onDeleteStudent(student?.id, i)" title="Delete">
+              <i class="fa fa-times"></i>
+            </button>
+            <button class="btn btn-secondary tooltips" data-placement="top" data-original-title="Cancel Edit"
+                    *ngIf="isEditMode(i)" (click)="disableEditMode()" title="Cancel Edit">
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+        </td>
+
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="students?.length == 0" class="col-lg-12 col-md-12 col-xl-12">
+    <div class="alert alert-info" role="alert">
+      <h4 class="alert-heading">No Students!</h4>
+      <p>No Students were found.</p>
+    </div>
+  </div>
+</div>
