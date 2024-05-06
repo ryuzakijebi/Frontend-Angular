@@ -46,19 +46,28 @@ export class AppComponent implements OnInit {
   }
 
   public onUpdateStudent(student: Student, index: number): void {
-    this.studentService.updateStudent(student).subscribe(
-      (response: Student) => {
-        console.log(response);
+    const studentId = student.id;
+    this.studentService.updateStudent(studentId, student).subscribe(
+      (updatedStudent: Student) => {
+        console.log("Student updated successfully:", updatedStudent);
         if (this.students) {
-          this.students[index] = response;
+          const studentIndex = this.students.findIndex(s => s.id === studentId);
+          if (studentIndex !== -1) {
+            this.students[studentIndex] = updatedStudent;
+          }
           this.disableEditMode();
         }
       },
       (error: HttpErrorResponse) => {
-        alert(error.message);
+        console.error("Error occurred while updating student:", error.message);
       }
     );
   }
+
+
+
+
+
 
   public onDeleteStudent(studentId: number, index: number): void {
     this.studentService.deleteStudent(studentId).subscribe(
@@ -97,15 +106,29 @@ export class AppComponent implements OnInit {
 
   public filterByDepartment(department: string): void {
     if (department === '') {
-      this.getStudents(); // Ambil semua data jika opsi "All Departments" dipilih
+      this.getStudents();
       return;
     }
+    this.studentService.getStudents().subscribe(
+      (response: Student[]) => {
+        this.students = response.filter(student => student.department === department);
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
+  }
 
-    // Filter data berdasarkan departemen
-    if (this.students) {
-      this.students = this.students.filter(student => student.department === department);
+  public confirmDelete(studentId: number, index: number): void {
+    const isConfirmed = window.confirm("Are you sure you want to delete this student?");
+    if (isConfirmed) {
+      this.onDeleteStudent(studentId, index);
     }
   }
+
+
+
+
 
 
 

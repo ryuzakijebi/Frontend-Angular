@@ -4,5 +4,4 @@ export interface Student {
   studentID: string;
   email: string;
   department: string;
-  imageUrl: string;
 }

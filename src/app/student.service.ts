@@ -18,8 +18,8 @@ export class StudentService {
     return this.http.post<Student>(`${this.apiServerUrl}/student/add`, student);
   }
 
-  public updateStudent(student: Student): Observable<Student> {
-    return this.http.put<Student>(`${this.apiServerUrl}/student/update/${student.id}`, student);
+  public updateStudent(studentId: number, updatedStudent: Student): Observable<Student> {
+    return this.http.put<Student>(`${this.apiServerUrl}/student/update/${studentId}`, updatedStudent);
   }
 
   public deleteStudent(studentId: number): Observable<void> {
