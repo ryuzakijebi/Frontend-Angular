@@ -21,7 +21,6 @@
   </div>
 </nav>
 
-
 <div class="container" id="main-container">
   <table class="table">
     <thead class="thead-light">
@@ -85,14 +84,12 @@
               *ngIf="!isEditMode(i)" (click)="confirmDelete(student?.id, i)" title="Delete">
               <i class="fa fa-times"></i>
             </button>
-
             <button class="btn btn-secondary tooltips" data-placement="top" data-original-title="Cancel Edit"
               *ngIf="isEditMode(i)" (click)="disableEditMode()" title="Cancel Edit">
               <i class="fa fa-times"></i>
             </button>
           </div>
         </td>
-
       </tr>
     </tbody>
   </table>

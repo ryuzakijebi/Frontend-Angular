@@ -14,6 +14,10 @@ export class StudentService {
     return this.http.get<Student[]>(`${this.apiServerUrl}/student/all`);
   }
 
+  public getPartialStudents(startIndex: number, limit: number): Observable<Student[]> {
+    return this.http.get<Student[]>(`${this.apiServerUrl}/student/partial/${startIndex}/${limit}`);
+  }
+
   public addStudent(student: Student): Observable<Student> {
     return this.http.post<Student>(`${this.apiServerUrl}/student/add`, student);
   }

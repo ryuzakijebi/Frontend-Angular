@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { Student } from './student';
 import { StudentService } from './student.service';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -12,17 +12,37 @@ import { NgForm } from '@angular/forms';
 export class AppComponent implements OnInit {
   public students?: Student[];
   public editStudentIndex: number = -1;
+  public currentPage: number = 1;
+  public itemsPerPage: number = 100; // Jumlah data yang ditampilkan per halaman
 
-  constructor(private studentService: StudentService){}
+  constructor(private studentService: StudentService) {}
 
   ngOnInit() {
     this.getStudents();
   }
 
+  @HostListener('window:scroll', ['$event'])
+  onScroll(event: any) {
+    if (this.bottomReached()) {
+      this.currentPage++;
+      this.getStudents();
+    }
+  }
+
+  bottomReached(): boolean {
+    return (window.innerHeight + window.scrollY) >= document.body.offsetHeight;
+  }
+
   public getStudents(): void {
-    this.studentService.getStudents().subscribe(
+    const startIndex = (this.currentPage - 1) + 1;
+    const limit = this.itemsPerPage;
+    this.studentService.getPartialStudents(startIndex, limit).subscribe(
       (response: Student[]) => {
-        this.students = response;
+        if (!this.students) {
+          this.students = response;
+        } else {
+          this.students = this.students.concat(response);
+        }
         console.log(this.students);
       },
       (error: HttpErrorResponse) => {
