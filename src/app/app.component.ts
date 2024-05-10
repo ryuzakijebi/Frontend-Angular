@@ -34,7 +34,7 @@ export class AppComponent implements OnInit {
   }
 
   public getStudents(): void {
-    const startIndex = (this.currentPage - 1) + 1;
+    const startIndex = (this.currentPage - 1);
     const limit = this.itemsPerPage;
     this.studentService.getPartialStudents(startIndex, limit).subscribe(
       (response: Student[]) => {
