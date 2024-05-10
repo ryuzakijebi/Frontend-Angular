@@ -85,10 +85,6 @@ export class AppComponent implements OnInit {
   }
 
 
-
-
-
-
   public onDeleteStudent(studentId: number, index: number): void {
     this.studentService.deleteStudent(studentId).subscribe(
       () => {
