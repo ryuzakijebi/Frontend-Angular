@@ -20,14 +20,7 @@ export class AppComponent implements OnInit {
   constructor(private studentService: StudentService) {}
 
   ngOnInit() {
-    // Check authentication status here
-    const isAuthenticated = true; // Replace with your authentication logic
-
-    if (!isAuthenticated) {
-      window.location.href = '/login'; // Redirect to login if not authenticated
-    } else {
-      this.getStudents();
-    }
+    this.getStudents();
   }
 
   @HostListener('window:scroll', ['$event'])
