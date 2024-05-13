@@ -4,11 +4,11 @@ import { Observable } from 'rxjs';
 import { Student } from './student';
 import { environment } from '../environments/environment';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class StudentService {
   private apiServerUrl = environment.apiBaseUrl;
 
-  constructor(private http: HttpClient){}
+  constructor(private http: HttpClient) {}
 
   public getStudents(): Observable<Student[]> {
     return this.http.get<Student[]>(`${this.apiServerUrl}/student/all`);
@@ -16,6 +16,10 @@ export class StudentService {
 
   public getPartialStudents(startIndex: number, limit: number): Observable<Student[]> {
     return this.http.get<Student[]>(`${this.apiServerUrl}/student/partial/${startIndex}/${limit}`);
+  }
+
+  public getStudentsByDepartment(department: string, startIndex: number, limit: number): Observable<Student[]> {
+    return this.http.get<Student[]>(`${this.apiServerUrl}/student/byDepartment/${department}/${startIndex}/${limit}`);
   }
 
   public addStudent(student: Student): Observable<Student> {
@@ -29,5 +33,4 @@ export class StudentService {
   public deleteStudent(studentId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiServerUrl}/student/delete/${studentId}`);
   }
-
 }

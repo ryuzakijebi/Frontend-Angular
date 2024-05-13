@@ -7,43 +7,52 @@ import { NgForm } from '@angular/forms';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-  public students?: Student[];
-  public editStudentIndex: number = -1;
-  public currentPage: number = 1;
-  public itemsPerPage: number = 100; // Jumlah data yang ditampilkan per halaman
+  public students: Student[] = [];
+  public editStudentIndex = -1;
+  public currentPage = 1;
+  public itemsPerPage = 100;
+  public departmentFilter = '';
+  public currentPageDepartment = 1;
 
   constructor(private studentService: StudentService) {}
 
   ngOnInit() {
-    this.getStudents();
+    // Check authentication status here
+    const isAuthenticated = true; // Replace with your authentication logic
+
+    if (!isAuthenticated) {
+      window.location.href = '/login'; // Redirect to login if not authenticated
+    } else {
+      this.getStudents();
+    }
   }
 
   @HostListener('window:scroll', ['$event'])
   onScroll(event: any) {
     if (this.bottomReached()) {
-      this.currentPage++;
-      this.getStudents();
+      if (this.departmentFilter !== '') {
+        this.currentPageDepartment++;
+        this.getStudentsByDepartment(this.departmentFilter);
+      } else {
+        this.currentPage++;
+        this.getStudents();
+      }
     }
   }
 
   bottomReached(): boolean {
-    return (window.innerHeight + window.scrollY) >= document.body.offsetHeight;
+    return window.innerHeight + window.scrollY >= document.body.offsetHeight;
   }
 
   public getStudents(): void {
-    const startIndex = (this.currentPage - 1);
+    const startIndex = this.currentPage - 1;
     const limit = this.itemsPerPage;
     this.studentService.getPartialStudents(startIndex, limit).subscribe(
       (response: Student[]) => {
-        if (!this.students) {
-          this.students = response;
-        } else {
-          this.students = this.students.concat(response);
-        }
-        console.log(this.students);
+        this.students = this.students.concat(response);
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
@@ -54,7 +63,6 @@ export class AppComponent implements OnInit {
   public onAddStudent(addForm: NgForm): void {
     this.studentService.addStudent(addForm.value).subscribe(
       (response: Student) => {
-        console.log(response);
         this.getStudents();
         addForm.reset();
       },
@@ -69,29 +77,22 @@ export class AppComponent implements OnInit {
     const studentId = student.id;
     this.studentService.updateStudent(studentId, student).subscribe(
       (updatedStudent: Student) => {
-        console.log("Student updated successfully:", updatedStudent);
-        if (this.students) {
-          const studentIndex = this.students.findIndex(s => s.id === studentId);
-          if (studentIndex !== -1) {
-            this.students[studentIndex] = updatedStudent;
-          }
-          this.disableEditMode();
+        const studentIndex = this.students.findIndex((s) => s.id === studentId);
+        if (studentIndex !== -1) {
+          this.students[studentIndex] = updatedStudent;
         }
+        this.disableEditMode();
       },
       (error: HttpErrorResponse) => {
-        console.error("Error occurred while updating student:", error.message);
+        console.error('Error occurred while updating student:', error.message);
       }
     );
   }
 
-
   public onDeleteStudent(studentId: number, index: number): void {
     this.studentService.deleteStudent(studentId).subscribe(
       () => {
-        console.log("Student deleted successfully.");
-        if (this.students) {
-          this.students.splice(index, 1);
-        }
+        this.students.splice(index, 1);
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
@@ -101,52 +102,60 @@ export class AppComponent implements OnInit {
 
   public searchStudents(key: string): void {
     const results: Student[] = [];
-    if (this.students) {
-      for (const student of this.students) {
-        if (student.name && student.studentID && student.email && student.department) {
-          if (student.name.toLowerCase().indexOf(key.toLowerCase()) !== -1 ||
-              student.studentID.toLowerCase().indexOf(key.toLowerCase()) !== -1 ||
-              student.email.toLowerCase().indexOf(key.toLowerCase()) !== -1 ||
-              student.department.toLowerCase().indexOf(key.toLowerCase()) !== -1) {
-            results.push(student);
-          }
-        }
+    for (const student of this.students) {
+      if (
+        student.name.toLowerCase().includes(key.toLowerCase()) ||
+        student.studentID.toLowerCase().includes(key.toLowerCase()) ||
+        student.email.toLowerCase().includes(key.toLowerCase()) ||
+        student.department.toLowerCase().includes(key.toLowerCase())
+      ) {
+        results.push(student);
       }
     }
-    if (results.length === 0 || !key) {
-      this.getStudents();
-    } else {
-      this.students = results;
-    }
+    this.students = results;
   }
 
   public filterByDepartment(department: string): void {
+    this.currentPageDepartment = 1;
     if (department === '') {
+      this.departmentFilter = '';
+      this.students = [];
       this.getStudents();
-      return;
+    } else {
+      this.departmentFilter = department;
+      this.getStudentsByDepartment(department);
     }
-    this.studentService.getStudents().subscribe(
-      (response: Student[]) => {
-        this.students = response.filter(student => student.department === department);
-      },
-      (error: HttpErrorResponse) => {
-        alert(error.message);
-      }
-    );
+  }
+
+  public getStudentsByDepartment(department: string): void {
+    if (department === 'all') {
+      this.getStudents();
+    } else {
+      const startIndex = this.currentPageDepartment - 1;
+      const limit = this.itemsPerPage;
+      this.studentService.getStudentsByDepartment(department, startIndex, limit).subscribe(
+        (response: Student[]) => {
+          if (this.currentPageDepartment === 1) {
+            this.students = response;
+          } else {
+            this.students = this.students.concat(response);
+          }
+        },
+        (error: HttpErrorResponse) => {
+          alert(error.message);
+        }
+      );
+    }
   }
 
   public confirmDelete(studentId: number, index: number): void {
-    const isConfirmed = window.confirm("Are you sure you want to delete this student?");
+    const isConfirmed = window.confirm(
+      'Are you sure you want to delete this student?'
+    );
     if (isConfirmed) {
       this.onDeleteStudent(studentId, index);
     }
   }
-
-
-
-
-
-
 
   public enableEditMode(index: number): void {
     this.editStudentIndex = index;

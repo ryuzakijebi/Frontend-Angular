@@ -10,12 +10,17 @@
         class="form-control mr-sm-2" placeholder="Search students..." required>
       <div class="btn-group">
         <button type="button" class="btn btn-secondary mr-1" (click)="filterByDepartment('')">All Departments</button>
-        <button type="button" class="btn btn-secondary mr-1" (click)="filterByDepartment('Software Engineering')">Software Engineering</button>
-        <button type="button" class="btn btn-secondary mr-1" (click)="filterByDepartment('Computer Engineering')">Computer Engineering</button>
-        <button type="button" class="btn btn-secondary mr-1" (click)="filterByDepartment('Informatics Engineering')">Informatics Engineering</button>
-        <button type="button" class="btn btn-secondary mr-1" (click)="filterByDepartment('Information Systems')">Information Systems</button>
+        <button type="button" class="btn btn-secondary mr-1"
+          (click)="filterByDepartment('Software Engineering')">Software Engineering</button>
+        <button type="button" class="btn btn-secondary mr-1"
+          (click)="filterByDepartment('Computer Engineering')">Computer Engineering</button>
+        <button type="button" class="btn btn-secondary mr-1"
+          (click)="filterByDepartment('Informatics Engineering')">Informatics Engineering</button>
+        <button type="button" class="btn btn-secondary mr-1"
+          (click)="filterByDepartment('Information Systems')">Information Systems</button>
         <button type="button" class="btn btn-secondary" (click)="filterByDepartment('Digital Business')">Digital
           Business</button>
+
       </div>
     </form>
   </div>
@@ -94,10 +99,5 @@
     </tbody>
   </table>
 
-  <div *ngIf="students?.length == 0" class="col-lg-12 col-md-12 col-xl-12">
-    <div class="alert alert-info" role="alert">
-      <h4 class="alert-heading">No Students!</h4>
-      <p>No Students were found.</p>
-    </div>
-  </div>
+
 </div>
